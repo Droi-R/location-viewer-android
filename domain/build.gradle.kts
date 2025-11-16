@@ -7,5 +7,5 @@ kotlin {
 }
 
 dependencies {
-    // Domain 모듈은 순수 Kotlin 코드만 사용
+    implementation(Libs.coroutinesCore)
 }

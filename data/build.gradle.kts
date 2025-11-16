@@ -1,12 +1,12 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
-    id("com.google.dagger.hilt.android") version "2.51"
+    id("com.google.dagger.hilt.android") version Versions.hilt
     kotlin("kapt")
 }
 
 android {
-    namespace = "com.droker.realtime_location_map.data"
+    namespace = "com.droker.realtimelocationmap"
     compileSdk = Versions.compileSdk
 
     defaultConfig {
@@ -29,6 +29,11 @@ dependencies {
     implementation(project(":domain"))
 
     implementation(Libs.coreKtx)
+
+    // Room
+    implementation(Libs.roomRuntime)
+    implementation(Libs.roomKtx)
+    kapt(Libs.roomCompiler)
 
     // Hilt
     implementation(Libs.hiltAndroid)
