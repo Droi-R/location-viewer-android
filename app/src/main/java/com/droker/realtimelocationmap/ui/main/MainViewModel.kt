@@ -16,14 +16,13 @@ class MainViewModel @Inject constructor(
     private val getCurrentLocationUseCase: GetCurrentLocationUseCase
 ) : ViewModel() {
 
-    private val _location = MutableLiveData<LocationPoint?>()
-    val location: LiveData<LocationPoint?> = _location
+    private val _locations = MutableLiveData<List<LocationPoint>>(emptyList())
+    val locations: LiveData<List<LocationPoint>> = _locations
 
     init {
-        // Room DB를 계속 구독해서 최신 위치 반영
         viewModelScope.launch {
-            getCurrentLocationUseCase().collectLatest { point ->
-                _location.value = point
+            getCurrentLocationUseCase().collectLatest { points ->
+                _locations.value = points
             }
         }
     }
