@@ -45,5 +45,4 @@ object Libs {
     const val androidJunit = "androidx.test.ext:junit:${Versions.androidJunit}"
     const val espresso = "androidx.test.espresso:espresso-core:${Versions.espresso}"
 
-    const val javapoet = "com.squareup:javapoet:${Versions.javapoet}"
 }

@@ -39,8 +39,6 @@ dependencies {
     implementation(Libs.hiltAndroid)
     kapt(Libs.hiltCompiler)
 
-    implementation(Libs.javapoet)
-
     testImplementation(Libs.junit)
     androidTestImplementation(Libs.androidJunit)
     androidTestImplementation(Libs.espresso)

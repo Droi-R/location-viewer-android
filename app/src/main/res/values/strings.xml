@@ -2,5 +2,5 @@
     <string name="app_name">realtime-location-map</string>
     <string name="location_default">위치 정보 없음</string>
     <string name="btn_load_location">현재 위치 불러오기</string>
-    <string name="naver_map_client_id">wQYjRPfnEEai66uKpSfu7nGIWed5hLdRJZGHnyk0</string>
+    <string name="naver_map_client_id">eycc32rh93</string>
 </resources>

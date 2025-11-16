@@ -21,6 +21,10 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    hilt {
+        enableAggregatingTask = false
+    }
+
     buildTypes {
         debug {
             isMinifyEnabled = false
@@ -71,12 +75,6 @@ dependencies {
     // Hilt
     implementation(Libs.hiltAndroid)
     kapt(Libs.hiltCompiler)
-
-    // Hilt + WorkManager
-    implementation(Libs.hiltWork)
-    kapt(Libs.hiltXCompiler)
-
-    implementation(Libs.javapoet)
 
     testImplementation(Libs.junit)
     androidTestImplementation(Libs.androidJunit)

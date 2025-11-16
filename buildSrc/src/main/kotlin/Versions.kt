@@ -42,5 +42,4 @@ object Versions {
     const val androidJunit = "1.2.1"
     const val espresso = "3.6.1"
 
-    const val javapoet = "1.13.0"
 }

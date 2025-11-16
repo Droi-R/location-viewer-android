@@ -10,6 +10,11 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import com.droker.realtimelocationmap.databinding.ActivityMainBinding
 import com.droker.realtimelocationmap.CurrentLocationWorker
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import android.widget.Toast
 
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate
@@ -27,6 +32,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var naverMap: NaverMap? = null
     private var marker: Marker? = null
+
+    private val locationPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { result ->
+            val granted = result[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                    result[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+
+            if (granted) {
+                enqueueLocationWork()
+            } else {
+                Toast.makeText(this, "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,14 +70,40 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
     }
 
+    private fun hasLocationPermission(): Boolean {
+        val fine = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val coarse = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        return fine || coarse
+    }
+
     private fun setupUi() {
         binding.btnCurrentLocation.setOnClickListener {
-            val request = OneTimeWorkRequestBuilder<CurrentLocationWorker>()
-                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                .build()
-
-            WorkManager.getInstance(this).enqueue(request)
+            if (hasLocationPermission()) {
+                enqueueLocationWork()
+            } else {
+                locationPermissionLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+                )
+            }
         }
+    }
+
+    private fun enqueueLocationWork() {
+        val request = OneTimeWorkRequestBuilder<CurrentLocationWorker>()
+            .build()
+
+        WorkManager.getInstance(this).enqueue(request)
     }
 
     private fun observeLocation() {

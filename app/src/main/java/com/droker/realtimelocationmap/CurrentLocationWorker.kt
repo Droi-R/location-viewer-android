@@ -3,26 +3,34 @@ package com.droker.realtimelocationmap
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.droker.realtimelocationmap.di.LocationWorkerEntryPoint
 import com.droker.realtimelocationmap.domain.location.LocationPoint
 import com.droker.realtimelocationmap.domain.location.LocationRepository
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.Tasks
-import androidx.hilt.work.HiltWorker
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.EntryPointAccessors
 
-@HiltWorker
-class CurrentLocationWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted workerParams: WorkerParameters,
-    private val locationRepository: LocationRepository
+class CurrentLocationWorker(
+    appContext: Context,
+    workerParams: WorkerParameters
 ) : CoroutineWorker(appContext, workerParams) {
 
+    // Hilt EntryPoint 통해 LocationRepository 주입
+    private val locationRepository: LocationRepository by lazy {
+        val entryPoint = EntryPointAccessors.fromApplication(
+            applicationContext,
+            LocationWorkerEntryPoint::class.java
+        )
+        entryPoint.locationRepository()
+    }
+
     override suspend fun doWork(): Result {
-        // 권한 체크
+        Log.d("CurrentLocationWorker", "doWork() 시작")
+
         val fineGranted = ContextCompat.checkSelfPermission(
             applicationContext,
             Manifest.permission.ACCESS_FINE_LOCATION
@@ -34,22 +42,23 @@ class CurrentLocationWorker @AssistedInject constructor(
         ) == PackageManager.PERMISSION_GRANTED
 
         if (!fineGranted && !coarseGranted) {
-            // 권한 없으면 실패 처리
+            Log.e("CurrentLocationWorker", "위치 권한 없음")
             return Result.failure()
         }
 
         val fused = LocationServices.getFusedLocationProviderClient(applicationContext)
 
         val location = try {
-            // lastLocation 은 nullable
-            Tasks.await(fused.lastLocation)
+            val loc = Tasks.await(fused.lastLocation)
+            Log.d("CurrentLocationWorker", "lastLocation = $loc")
+            loc
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("CurrentLocationWorker", "lastLocation 에러", e)
             null
         }
 
         if (location == null) {
-            // 위치 못 얻었으면 나중에 다시 시도
+            Log.e("CurrentLocationWorker", "lastLocation 이 null, retry 호출")
             return Result.retry()
         }
 
@@ -58,7 +67,7 @@ class CurrentLocationWorker @AssistedInject constructor(
             longitude = location.longitude
         )
 
-        // Room DB 저장
+        Log.d("CurrentLocationWorker", "위치 저장: $point")
         locationRepository.saveLocation(point)
 
         return Result.success()
