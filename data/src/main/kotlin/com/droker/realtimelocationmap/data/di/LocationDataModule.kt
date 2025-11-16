@@ -1,7 +1,7 @@
-package com.example.realtimelocationmap.data.di
+package com.droker.realtimelocationmap.data.di
 
-import com.example.realtimelocationmap.data.location.FakeLocationRepository
-import com.example.realtimelocationmap.domain.location.LocationRepository
+import com.droker.realtimelocationmap.data.location.LocationRepositoryImpl
+import com.droker.realtimelocationmap.domain.location.LocationRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -15,6 +15,6 @@ abstract class LocationDataModule {
     @Binds
     @Singleton
     abstract fun bindLocationRepository(
-        impl: FakeLocationRepository
+        impl: LocationRepositoryImpl
     ): LocationRepository
 }

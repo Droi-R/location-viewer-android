@@ -16,9 +16,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://repository.map.naver.com/archive/maven")
     }
 }
 
 rootProject.name = "realtime-location-map"
-include(":app")
-include(":data", ":domain")
+include(":app", ":data", ":domain")
