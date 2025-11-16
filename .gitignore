@@ -1,19 +1,17 @@
+# IDE
+.idea/
 *.iml
-.gradle
-/local.properties
-/.idea
-/caches
-.GitHub
+
+# Local config
+local.properties
 .DS_Store
 
+# Gradle
+.gradle/
 **/build/
 **/.gradle/
-/build
+
+# Android
 /captures
 .externalNativeBuild
 .cxx
-
-app/build/
-data/build/
-domain/build/
-buildSrc/build/
